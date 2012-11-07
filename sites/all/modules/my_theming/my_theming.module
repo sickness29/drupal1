@@ -1,0 +1,75 @@
+<?php
+
+/**
+ * Implements hook_menu().
+ */
+function my_theming_menu() {
+  $items = array();
+  $items['theme-page'] = array(
+    'title'           => 'Theme Page',
+    'page callback'   => 'my_theming_theme_page_callback',
+    'access callback' => TRUE,
+  );
+  return $items;
+}
+
+
+/**
+ * Function my_theming_theme_page_callback().
+ */
+function my_theming_theme_page_callback() {
+  $items = array('title1', 'title2', 'title3');
+  $fields = array(
+    '#title'       => t('some fieldset'),
+    '#children'    => t('some text'),
+  );
+  $header = array(
+    array('data' => '1'),
+    array('data' => '2'),
+    array('data' => '3'),
+  );
+  $rows = array();
+  $rows[] = array(
+    array('data' => '11'),
+    array('data' => '12'),
+    array('data' => '13'),
+  );
+  $rows[] = array(
+    array('data' => '21'),
+    array('data' => '22'),
+    array('data' => '23'),
+  );
+  $rows[] = array(
+    array('data' => '31'),
+    array('data' => '32'),
+    array('data' => '33'),
+  );
+  $image = array(
+    'style_name' => 'my',
+    'path' => '1.jpg',
+    'width' => 150,
+    'height' => 150,
+  );
+  $content = theme('item_list', array('items' => $items));
+  $content .= theme('fieldset', array('element' => $fields));
+  $content .= theme('table',array('header' => $header, 'rows' => $rows));
+  $content .= theme('image_style', $image);
+  $node = array(
+    'node' => $content,
+  );
+  $content = theme('my_theming_template', $node);
+  return $content;
+}
+
+
+/**
+ * Implements hook_theme().
+ */
+function my_theming_theme() {
+  return array(
+    'my_theming_template' => array(
+      'template' => 'template',
+      'variables' => array('node' => NULL),
+    ),
+  );
+}

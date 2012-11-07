@@ -1,0 +1,6 @@
+; &Id$
+
+name = My theming
+description = My first theming module
+version = 7.x-dev
+core = 7.x

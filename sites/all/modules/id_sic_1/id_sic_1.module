@@ -1,0 +1,194 @@
+<?php
+
+/**
+ * Implements hook_menu() for main, 403, 404 pages.
+ */
+function id_sic_1_menu() {
+	$items = array();
+	$items['main-page'] = array(
+		'title' => 'Main Page',
+		'page callback' => 'id_sic_1_main_page_callback',
+		'access callback' => TRUE,
+	);
+	$items['error-403'] = array(
+		'title' => 'Error 403',
+		'page callback' => 'id_sic_1_callback_403',
+		'access callback' => TRUE,
+	);
+
+	$items['error-404'] = array(
+		'title' => 'Error 404',
+		'page callback' => 'id_sic_1_callback_404',
+		'access callback' => TRUE,
+	);
+	return $items;
+}
+
+
+/**
+ * Implements hook_block_info().
+ */
+function id_sic_1_block_info() {
+	$blocks = array();
+	$blocks['some-block'] = array(
+		'info' => t('Block'),
+		'cache' => DRUPAL_NO_CACHE,
+	);
+	return $blocks;
+}
+
+
+/**
+ * Implements hook_block_view().
+ */
+function id_sic_1_block_view($delta = '') {
+	$block = array();
+	switch ($delta) {
+		case 'some-block':
+			if (user_access('my permission')) {
+				$block['subject'] = t('Title');
+				$block['content'] = t('message');
+			}
+			else {
+				$block['content'] = t('Access to view this content is denied');
+			}
+			break;
+
+	}
+	return $block;
+}
+
+
+/**
+ * Implements hook_permission().
+ */
+function id_sic_1_permission() {
+	return array(
+		'my permission' => array(
+			'title' => t('My permission'),
+			'description' => t('my first permission'),
+		),
+	);
+}
+
+
+/**
+ * Implements hook_node_view().
+ */
+function id_sic_1_node_view($node, $view_mode) {
+	if ($node->nid != 226 && $view_mode == 'full') {
+		drupal_set_message($node->title . ' - hook_node_view()');
+	}
+}
+
+
+/**
+ * Implements hook_node_access().
+ */
+function id_sic_1_node_access($node, $op, $account) {
+	if ($op == 'view') {
+		if ($node->nid == 226) {
+			return NODE_ACCESS_DENY;
+		}
+	}
+}
+
+
+/**
+ * Implements hook_node_insert().
+ */
+function id_sic_1_node_insert($node) {
+	db_insert('my_table')
+		->fields(array(
+		'id' => 'n_' . $node->nid,
+		'time' => time(),
+		))
+		->execute();
+}
+
+
+/**
+ * Implements hook_node_update().
+ */
+function id_sic_1_node_update($node) {
+	db_update('my_table')
+		->fields(array('time' => time()))
+		->condition('id', 'n_' . $node->nid)
+		->execute();
+}
+
+
+/**
+ * Implements hook_node_delete().
+ */
+function id_sic_1_node_delete($node) {
+	db_delete('my_table')
+		->condition('id', 'n_' . $node->nid)
+		->execute();
+}
+
+
+/**
+ * Implements hook_user_view().
+ */
+function id_sic_1_user_view($account) {
+	drupal_set_message('<pre>' . print_r($account->roles,1) . '</pre>');
+}
+
+
+/**
+ * Implements hook_user_insert().
+ */
+function id_sic_1_user_insert(&$edit, $account) {
+	db_insert('my_table')
+		->fields(array(
+		'id' => 'u_' . $account->uid,
+		'time' => time(),
+		))
+		->execute();
+}
+
+
+/**
+ * Implements hook_user_update().
+ */
+function id_sic_1_user_update(&$edit, $account) {
+	db_update('my_table')
+		->fields(array('time' => time()))
+		->condition('id', 'u_' . $account->uid)
+		->execute();
+}
+
+
+/**
+ * Implements hook_user_delete().
+ */
+function id_sic_1_user_delete($account) {
+	db_delete('my_table')
+		->condition('id', 'u_' . $account->uid)
+		->execute();
+}
+
+
+/**
+ * function for main
+ */
+function id_sic_1_main_page_callback() {
+	return t('Welcome');
+}
+
+
+/**
+ * function for 403 error
+ */
+function id_sic_1_callback_403() {
+	return t('Access denied');
+}
+
+
+/**
+ * function for 404 error
+ */
+function id_sic_1_callback_404() {
+	return t('Page not found');
+}
