@@ -21,7 +21,127 @@ function id_sic_1_menu() {
 		'page callback' => 'id_sic_1_callback_404',
 		'access callback' => TRUE,
 	);
+	$items['contacts'] = array(
+		'title' => 'Contacts',
+		'page callback' => 'id_sic_1_form',
+		'access arguments' => array('access content'),
+		'description' => 'Contacts form',
+		'type' => MENU_CALLBACK,
+	);
+	$items['thanks'] = array(
+		'title' => 'Thank You!',
+		'page callback' => 'id_sic_1_thanks_callback',
+		'access callback' => TRUE,
+	);
 	return $items;
+}
+
+
+/**
+ * function id_sic_1_form().
+ */
+function id_sic_1_form() {
+	return drupal_get_form('id_sic_1_contacts_form');
+}
+
+
+/**
+ * function id_sic_1_contacts_form().
+ */
+function id_sic_1_contacts_form($form_state) {
+	$form = array();
+	$form['random_text'] = array(
+		'#type' => 'markup',
+		'#markup' => 'Random text',
+	);
+	$form['first_name'] = array(
+		'#type' => 'textfield',
+		'#title' => 'First name',
+		'#required' => TRUE,
+	);
+	$form['second_name'] = array(
+		'#type' => 'textfield',
+		'#title' => 'Second name',
+	);
+	$form['nickname'] = array(
+		'#type' => 'textfield',
+		'#title' => 'Nickname',
+		'#required' => TRUE,
+	);
+	$form['e_mail'] = array(
+		'#type' => 'textfield',
+		'#title' => 'E-mail',
+		'#required' => TRUE,
+	);
+	$form['phone_number'] = array(
+		'#type' => 'textfield',
+		'#title' => 'Phone number',
+	);
+	$sex=array(0 => t('Male'), 1 => t('Female'));
+	$form['sex'] = array(
+		'#type' => 'radios',
+		'#title' => 'Sex',
+		'#options' => $sex,
+		'#required' => TRUE,
+	);
+	$form['country'] = array(
+		'#type' => 'select',
+		'#title' => 'Country',
+		'#options' => array(
+			0 => t('Ukraine'),
+			1 => t('Russia'),
+			2 => t('USA'),
+		),
+		'#required' => TRUE,
+	);
+	$form['message'] = array(
+		'#title' => 'Message',
+		'#type' => 'textarea',
+		'#required' => TRUE,
+	);
+	$form['agree'] = array(
+		'#title' => t('I am agree with rules'),
+		'#type' => 'checkbox',
+		'#required' => TRUE,
+	);
+	$form['randomFieldset'] = array(
+		'#type' => 'fieldset',
+		'#title' => 'Random title',
+		'#collapsible' => TRUE,
+		'#collapsed' => TRUE,
+	);
+	$form['randomFieldset']['text'] = array(
+		'#type' => 'markup',
+		'#markup' => 'Random text',
+	);
+	$form['submit'] = array(
+		'#type' => 'submit',
+		'#value' => t('Submit'),
+	);
+	return $form;
+}
+
+
+/**
+ * Validation of contact form.
+ */
+function id_sic_1_contacts_form_validate($form, &$form_state) {
+	$e_mail = filter_var($form_state['values']['e_mail'], FILTER_VALIDATE_EMAIL);
+	if (!$e_mail) {
+		form_set_error('e_mail', t('Incorrect e-mail'));
+	}
+	if ($form_state['values']['phone_number'] && !preg_match('/^(\+?\d+)?\s*(\(\d+\))?[\s-]*([\d-]*)$/',
+$form_state['values']['phone_number'])) {
+		form_set_error('phone_number',t('Incorrect phone number'));
+	}
+}
+
+
+/**
+ * Submit contact form.
+ */
+function id_sic_1_contacts_form_submit($form, &$form_state) {
+	$form_state['redirect'] = 'thanks';
 }
 
 
@@ -191,4 +311,12 @@ function id_sic_1_callback_403() {
  */
 function id_sic_1_callback_404() {
 	return t('Page not found');
+}
+
+
+/**
+ * function for thanks page
+ */
+function id_sic_1_thanks_callback() {
+	return t('Thank you very much');
 }
