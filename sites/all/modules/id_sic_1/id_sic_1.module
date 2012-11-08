@@ -52,6 +52,8 @@ function id_sic_1_contacts_form($form_state) {
 	$form = array();
 	$form['random_text'] = array(
 		'#type' => 'markup',
+		'#prefix' => '<p>',
+		'#suffix' => '</p>',
 		'#markup' => 'Random text',
 	);
 	$form['first_name'] = array(
@@ -166,8 +168,11 @@ function id_sic_1_block_view($delta = '') {
 	switch ($delta) {
 		case 'some-block':
 			if (user_access('my permission')) {
-				$block['subject'] = t('Title');
-				$block['content'] = t('message');
+				$block['subject'] = t('My table pages');
+				$block['content'] = array(
+					array('#children' => l('Select from table', 'select-page') . '<br>'),
+					array('#children' => l('Insert into table', 'insert-page')),
+				);
 			}
 			else {
 				$block['content'] = t('Access to view this content is denied');
