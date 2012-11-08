@@ -1,0 +1,188 @@
+<?php
+
+/**
+ * Implements hook_menu().
+ */
+function my_database_menu() {
+  $items = array();
+  $items['insert-page'] = array(
+    'title' => 'Insert page',
+    'page callback' => 'my_database_form',
+    'access callback' => TRUE,
+  );
+  $items['select-page'] = array(
+    'title' => 'Show page',
+    'page callback' => 'my_database_show_callback',
+    'access callback' => TRUE,
+  );
+  $items['delete-page'] = array(
+    'title' => 'Are you sure to want delete?',
+    'page callback' => 'my_database_delete_callback',
+    'access callback' => TRUE,
+  );
+  return $items;
+}
+
+
+/**
+ * Function my_database_delete_callback().
+ */
+function my_database_delete_callback() {
+  return drupal_get_form('my_database_delete_form');
+}
+
+
+/**
+ * Function my_database_delete_form().
+ */
+function my_database_delete_form($form_state) {
+  $form = array();
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Delete'),
+  );
+  return $form;
+}
+
+
+/**
+ * Function my_database_delete_form_submit().
+ */
+function my_database_delete_form_submit($form, &$form_state) {
+  if (isset($_GET['id'])) {
+    db_delete('custom_table')
+      ->condition('id', $_GET['id'])
+      ->execute();
+  }
+  $form_state['redirect'] = 'select-page';
+}
+
+/**
+ * Function my_database_show_callback().
+ */
+function my_database_show_callback() {
+  $header = array(
+    array('data' => t('Number')),
+    array('data' => t('Teaser')),
+    array('data' => t('Text')),
+    array('data' => t('Actions'), 'colspan' => 2),
+  );
+  $q = db_select('custom_table', 'c')
+    ->fields('c')
+    ->orderBy('c.id', 'desc')
+    ->execute();
+  $rows = array();
+  foreach ($q as $item) {
+    $rows[] = array(
+      array('data' => $item->number),
+      array('data' => $item->teaser),
+      array('data' => $item->text),
+      array('data' => l('Edit', 'insert-page', array('query' => array('id' => $item->id)))),
+      array('data' => l('Delete', 'delete-page', array('query' => array('id' => $item->id)))),
+    );
+  }
+  $content = theme('table', array('header' => $header, 'rows' => $rows));
+  return $content;
+}
+
+
+/**
+ * Function my_database_form().
+ */
+function my_database_form() {
+  return drupal_get_form('my_database_insert_form');
+}
+
+
+/**
+ * Function my_database_insert_form().
+ */
+function my_database_insert_form($form_state) {
+  $form = array();
+  if (isset($_GET['id'])) {
+    $q = db_select('custom_table', 'c')
+    ->fields('c')
+    ->condition('id', $_GET['id'])
+    ->execute()
+    ->fetchObject();
+    $num = $q->number;
+    $teaser = $q->teaser;
+    $text = $q->text;
+  }
+  else {
+    $num = '';
+    $teaser = '';
+    $text = '';
+  }
+  $form['number'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Number'),
+    '#maxlength' => 11,
+    '#required' => TRUE,
+    '#default_value' => $num,
+  );
+  $form['teaser'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Teaser'),
+    '#maxlength' => 150,
+    '#required' => TRUE,
+    '#default_value' => $teaser,
+  );
+  $form['text'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Text'),
+    '#required' => TRUE,
+    '#default_value' => $text,
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Submit'),
+  );
+  return $form;
+}
+
+
+/**
+ * Function my_database_insert_form_validate().
+ */
+function my_database_insert_form_validate($form, &$form_state) {
+  if(!ctype_digit($form_state['values']['number'])) {
+    form_set_error('number', t('Enter the number'));
+  }
+}
+
+
+/**
+ * Function my_database_insert_form_submit().
+ */
+function my_database_insert_form_submit($form, &$form_state) {
+  if (isset($_GET['id'])) {
+    $q = db_select('custom_table', 'c')
+    ->condition('c.id', $_GET['id'])
+    ->countQuery()
+    ->execute()
+    ->fetchField();
+    if ($q == 1) {
+      db_update('custom_table')
+      ->fields(array(
+        'number' => $form_state['values']['number'],
+        'teaser' => $form_state['values']['teaser'],
+        'text' => $form_state['values']['text'],
+      ))
+      ->condition('id', $_GET['id'])
+      ->execute();
+      drupal_set_message(t('Data was updated'));
+    }
+  }
+  else {
+    db_insert('custom_table')
+      ->fields(array(
+        'number' => $form_state['values']['number'],
+        'teaser' => $form_state['values']['teaser'],
+        'text' => $form_state['values']['text'],
+      ))
+      ->execute();
+    drupal_set_message(t('Data was added'));
+  }
+  $form_state['redirect'] = 'select-page';
+}

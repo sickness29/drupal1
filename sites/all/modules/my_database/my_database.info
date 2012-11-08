@@ -1,0 +1,6 @@
+; &Id:$
+
+name = My database
+description = my database module
+version = 7.x-dev
+core = 7.x

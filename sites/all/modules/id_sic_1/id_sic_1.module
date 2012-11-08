@@ -220,8 +220,8 @@ function id_sic_1_node_access($node, $op, $account) {
 function id_sic_1_node_insert($node) {
 	db_insert('my_table')
 		->fields(array(
-		'id' => 'n_' . $node->nid,
-		'time' => time(),
+			'id' => 'n_' . $node->nid,
+			'time' => time(),
 		))
 		->execute();
 }
