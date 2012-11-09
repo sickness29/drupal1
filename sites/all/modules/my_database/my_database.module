@@ -74,11 +74,11 @@ function my_database_show_callback() {
   $rows = array();
   foreach ($q as $item) {
     $rows[] = array(
-      array('data' => $item->number),
-      array('data' => $item->teaser),
-      array('data' => $item->text),
-      array('data' => l('Edit', 'insert-page', array('query' => array('id' => $item->id)))),
-      array('data' => l('Delete', 'delete-page', array('query' => array('id' => $item->id)))),
+      array('data' => $item->number, 'style' => 'text-align: center'),
+      array('data' => $item->teaser, 'style' => 'text-align: center'),
+      array('data' => $item->text, 'style' => 'text-align: center'),
+      array('data' => l('Edit', 'insert-page', array('query' => array('id' => $item->id))), 'style' => 'text-align: center'),
+      array('data' => l('Delete', 'delete-page', array('query' => array('id' => $item->id))), 'style' => 'text-align: center'),
     );
   }
   $content = theme('table', array('header' => $header, 'rows' => $rows));
@@ -117,7 +117,7 @@ function my_database_insert_form($form_state) {
   $form['number'] = array(
     '#type' => 'textfield',
     '#title' => t('Number'),
-    '#maxlength' => 11,
+    '#maxlength' => 10,
     '#required' => TRUE,
     '#default_value' => $num,
   );
