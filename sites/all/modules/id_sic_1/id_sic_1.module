@@ -171,7 +171,10 @@ function id_sic_1_block_view($delta = '') {
 				$block['subject'] = t('My table pages');
 				$block['content'] = array(
 					array('#children' => l('Select from table', 'select-page') . '<br>'),
-					array('#children' => l('Insert into table', 'insert-page')),
+					array('#children' => l('Insert into table', 'insert-page') . '<br>'),
+					array('#children' => l('Contacts', 'contacts') . '<br>'),
+					array('#children' => l('Contacts by Webform', 'webform/contacts') . '<br>'),
+					array('#children' => l('Theme page', 'theme-page')),
 				);
 			}
 			else {

@@ -22,6 +22,8 @@ function my_theming_theme_page_callback() {
   $fields = array(
     '#title'       => t('some fieldset'),
     '#children'    => t('some text'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
   );
   $header = array(
     array('data' => '1'),
